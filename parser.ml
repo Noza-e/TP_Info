@@ -113,10 +113,25 @@ let rec condition_parser1 (l : lexeme list) : lexeme list =
 
 (* Question 6 - Niveau 2 *)
 
-(* let rec condition_parser2 (l : lexeme list) : lexeme list =
-  | Not::q -> 
-;;*)
-
+let rec condition_parser2 (l : lexeme list) : lexeme list =
+  match l with
+  | Not::t -> condition_parser2(t)
+  | ParG::t -> let c = parentheses(t) in (condition_parser2(fst c))@(snd c) (*! Pas sûr du tout de ce qui est attendu à droite de ParD *)
+  | _ -> let m = expression_parser(l) in
+          let n = 
+            match m with
+            | h::t when (h=Egal) || (h=NonEgal) || (h=PlusGrand) || (h=PlusPetit) || (h=PlusGrandEgal) || (h=PlusPetitEgal)
+                    -> begin
+                      match t with 
+                      | p::q when (p=IsNull) || (p=IsNotNull) -> q
+                      | _ -> expression_parser(t)
+                      end
+            | _ -> m
+          in
+          match n with
+          | a::z when (a=And) || (a=Or) -> condition_parser2(z)
+          | _ -> n
+;;
   
 (*
 |------------------------------------------------------------------------------------------------------------------|
@@ -142,7 +157,7 @@ let having_clause_parser (l : lexeme list) : lexeme list =
 
 (* Question 10 *)
 
-let rec liste_colonne_parser (l : lexeme list) : lexeme list = (*? Est ce qu'il est bien fait ?*)
+let rec liste_colonne_parser (l : lexeme list) : lexeme list =
   let temp = colonne_parser l in
   match temp with
   | Virgule :: t -> liste_colonne_parser t
@@ -277,9 +292,6 @@ test_parser 6 expression_parser [ParG ; Nom("A") ; Div ; Valeur(2) ; Plus ; ParD
 test_parser 7 expression_parser [ParG ; Nom("A") ; Div ; Valeur(2) ; Plus ; Valeur 1; ParD; Fois ; ParG ; Valeur(3) ; ParD] true
 
 (*
-! Partie 3 intégralement finie 
- Je te laisse vérifier que j'ai tout bien fait stv 
- Juste je t'ai laissé un message a un endroit pour etre sur tu verra
-! J'ai aussi skip toutes les questions théoriques on verra plus tard pour les faire   
-! Partie 4 finie aussi 
+Q6 faite mais détails à voir avec la prof.
+Q7 euuuuuh flemme XD
 *)
